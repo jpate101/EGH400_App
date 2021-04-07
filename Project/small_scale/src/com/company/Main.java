@@ -1,19 +1,15 @@
 package com.company;
 
-import javax.swing.*;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.*;
 import java.util.Base64;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Semaphore;
-import java.util.Base64.Encoder;
 
 public class Main {
+
     public static RSA rsa;
 
 
@@ -26,16 +22,7 @@ public class Main {
         }catch(Exception e){
             e.printStackTrace();
         }
-        //database connection
-        try{
-            //create connection
-            server_db_conection main_con = new server_db_conection("jdbc:mariadb://localhost:1433","egh400_test","root","jpate101");
-        }catch(Exception e){
-            System.out.println("error: unable to connect to database");
-            //e.printStackTrace();
-        }
 
-        //
         //start server
         ServerSocket server = null;
         try {
@@ -78,16 +65,12 @@ public class Main {
             this.clientSocket = socket;
         }
 
+
         @Override
         public void run() {
-            PrintWriter out = null;
-            BufferedReader in = null;
             byte[] key_en = rsa.privateKey.getEncoded();
             DataOutputStream dOut = null;
-
             try {
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String line;
 
                 dOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -104,41 +87,24 @@ public class Main {
                 String message_s = rsa.decryptMessage_cipher(message,rsa.publicKey);
                 System.out.printf("Sent from the client: %s\n", message_s);
 
-                /*
-                while ((line = in.readLine()) != null) {
-                    System.out.printf("Sent from the client: %s\n", line);
-                    //out.println(line);
-                    if(line.equals("LOGIN_request")){
-                        System.out.printf("login request rev");
-                        String LOGIN_request_user = in.readLine();
-                        String LOGIN_request_pass = in.readLine();
-                        if(LOGIN_request_user.equals("Admin") && LOGIN_request_pass.equals("1234")){
-                            System.out.println("T");
-                            out.println("T");
-                        }else{
-                            System.out.println("F");
-                            out.println("F");
-                        }
-                    }
+                ///////////////////////////////////////
 
-                }
-                */
-            } catch (IOException ex) {
-                ex.printStackTrace();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    if (in != null)
-                        in.close();
-                    clientSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
+
+
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }
+

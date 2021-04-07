@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,8 +26,10 @@ import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.net.ServerSocket;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Scanner;
 
 
@@ -119,15 +123,27 @@ public class MainActivity extends AppCompatActivity {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 scanner = new Scanner(System.in);
                 ObjectInputStream inputStream;
+                DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
-                //key
-                inputStream = new ObjectInputStream(socket.getInputStream());
-                rsa = new RSA();
-                Object obj = inputStream.readObject();
+                DataInputStream dIn = new DataInputStream(socket.getInputStream());
+                int length = dIn.readInt();// read length of incoming message
+                byte[] key_en = new byte[length];
+                if(length>0) {
+                    dIn.readFully(key_en, 0, key_en.length); // read the message
+                }
 
-                rsa.update_server_encryptKey(obj);
-                out.println(rsa.encryptMessage("this is the message i want to see"));
+                KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
+                PrivateKey ret = kf.generatePrivate(new PKCS8EncodedKeySpec(key_en));
+
+                byte[] test;
+                test = RSA.encryptMessage_cipher("this is the message i want to see",ret);
+                dOut.writeInt(test.length); // write length of the message
+                dOut.write(test);
+
+
+
                 //
+                /*
                 while(state.equals("empty")){
                     if(in.equals("EXIT")){
                         break;
@@ -142,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 }
+
+                 */
                 scanner.close();
 
             } catch (IOException | ClassNotFoundException e) {
