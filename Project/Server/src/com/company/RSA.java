@@ -19,9 +19,10 @@ public class RSA {
 
      */
 
-    public static String decryptMessage_cipher(byte[] encryptedText , PublicKey publicKey) throws Exception {
+    public static String decryptMessage_cipher(byte[] encryptedText , PublicKey publicKey1) throws Exception {
+        System.out.println(publicKey);
 
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.DECRYPT_MODE, publicKey);
         return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedText)));
         //return new String(plainText);

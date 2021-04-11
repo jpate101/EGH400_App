@@ -1,17 +1,12 @@
 package com.company;
 
-import javax.swing.*;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.*;
 import java.util.Base64;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Semaphore;
-import java.util.Base64.Encoder;
 
 public class Main {
     public static RSA rsa;
@@ -19,13 +14,6 @@ public class Main {
 
     public static void main(String[] args) {
         int PORT = 12345;
-        //generate RSA Keys
-        rsa = new RSA();
-        try{
-            rsa.getRSAKeys();
-        }catch(Exception e){
-            e.printStackTrace();
-        }
         //database connection
         try{
             //create connection
@@ -80,14 +68,15 @@ public class Main {
 
         @Override
         public void run() {
-            PrintWriter out = null;
-            BufferedReader in = null;
+            rsa = new RSA();
+            try{
+                rsa.getRSAKeys();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
             byte[] key_en = rsa.privateKey.getEncoded();
             DataOutputStream dOut = null;
-
             try {
-                out = new PrintWriter(clientSocket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String line;
 
                 dOut = new DataOutputStream(clientSocket.getOutputStream());
@@ -103,6 +92,31 @@ public class Main {
 
                 String message_s = rsa.decryptMessage_cipher(message,rsa.publicKey);
                 System.out.printf("Sent from the client: %s\n", message_s);
+
+                //gen aes
+                AES aes = new AES();
+
+                length = dIn.readInt();// read length of incoming message
+                message = new byte[length];
+                if(length>0) {
+                    dIn.readFully(message, 0, message.length); // read the message
+                }
+
+                //rsa decryption
+                String aes_key_en = rsa.decryptMessage_cipher(message,rsa.publicKey);
+
+                // decode the base64 encoded string
+                byte[] decodedKey = Base64.getDecoder().decode(aes_key_en);
+                // rebuild key using SecretKeySpec
+                SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+                System.out.println(originalKey);
+
+                aes.secretKey = originalKey;
+
+                String success = "success";
+                dOut.writeUTF(aes.encrypt(success));
+
+
 
                 /*
                 while ((line = in.readLine()) != null) {
@@ -129,11 +143,6 @@ public class Main {
                 e.printStackTrace();
             } finally {
                 try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    if (in != null)
-                        in.close();
                     clientSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();

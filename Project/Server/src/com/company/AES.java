@@ -1,21 +1,11 @@
-package com.example.app;
-
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.spec.KeySpec;
-import java.util.Base64;
+package com.company;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 
 public class AES {
     public static SecretKey secretKey;
@@ -23,7 +13,7 @@ public class AES {
 
     public static void set_server_keys(String aes_key) throws UnsupportedEncodingException {
         secretKey_encoded =  aes_key.getBytes();
-        secretKey = new SecretKeySpec(secretKey_encoded, 0, secretKey_encoded.length, "AES/ECB/PKCS5Padding");
+        secretKey = new SecretKeySpec(secretKey_encoded, 0, secretKey_encoded.length, "AES");
     }
 
     public static void set_server_keys_2(Object aes_key) throws UnsupportedEncodingException {
@@ -31,13 +21,12 @@ public class AES {
     }
 
     public static void GenerateKeys() throws Exception {
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES/ECB/PKCS5Padding");
         keyGen.init(256); // for example
         secretKey = keyGen.generateKey();
         secretKey_encoded = secretKey.getEncoded();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public static String encrypt(String strToEncrypt)
     {
         try
@@ -53,7 +42,6 @@ public class AES {
         return null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public static String decrypt(String strToDecrypt)
     {
         try
@@ -68,7 +56,4 @@ public class AES {
         }
         return null;
     }
-
-
-
 }

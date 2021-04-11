@@ -30,6 +30,7 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 import java.util.Scanner;
 
 
@@ -47,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private String temp_UserName = "Admin";
     private String temp_Passwowrd = "1234";
     private boolean login_isValid = false;
-
-    RSA rsa;
 
 
     @Override
@@ -119,9 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             try (Socket socket = new Socket(ip, 12345)) {
-                out = new PrintWriter(socket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                scanner = new Scanner(System.in);
+
                 ObjectInputStream inputStream;
                 DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
@@ -139,6 +136,36 @@ public class MainActivity extends AppCompatActivity {
                 test = RSA.encryptMessage_cipher("this is the message i want to see",ret);
                 dOut.writeInt(test.length); // write length of the message
                 dOut.write(test);
+
+                AES aes = new AES();
+                aes.GenerateKeys();
+                // get base64 encoded version of the key
+                String encodedKey = Base64.getEncoder().encodeToString(aes.secretKey_encoded);
+
+                //rsa encryption
+                byte[] aes_key_en = RSA.encryptMessage_cipher(encodedKey,ret);
+
+                dOut.writeInt(aes_key_en.length); // write length of the message
+                dOut.write(aes_key_en);
+
+                Log.e("YOUR_APP_LOG_TAG", aes.decrypt(dIn.readUTF()));
+
+
+                /*
+
+                AES aes = new AES();
+                aes.GenerateKeys();
+
+                // get base64 encoded version of the key
+                String encodedKey = Base64.getEncoder().encodeToString(aes.secretKey.getEncoded());
+
+                //rsa encryption
+                byte[] encodedKey_en = RSA.encryptMessage_cipher(encodedKey,ret);
+
+                dOut.writeInt(encodedKey_en.length); // write length of the message
+                dOut.write(encodedKey_en);
+
+                 */
 
 
 
