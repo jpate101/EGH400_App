@@ -12,3 +12,4 @@ public class temp_Home extends AppCompatActivity {
         setContentView(R.layout.activity_temp__home);
     }
 }
+

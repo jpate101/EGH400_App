@@ -10,6 +10,8 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     public static RSA rsa;
+    public static server_db_conection main_con;
+
 
 
     public static void main(String[] args) {
@@ -17,7 +19,7 @@ public class Main {
         //database connection
         try{
             //create connection
-            server_db_conection main_con = new server_db_conection("jdbc:mariadb://localhost:1433","egh400_test","root","jpate101");
+            main_con = new server_db_conection("jdbc:mariadb://localhost:1433","egh400_test","root","jpate101");
         }catch(Exception e){
             System.out.println("error: unable to connect to database");
             //e.printStackTrace();
@@ -60,11 +62,13 @@ public class Main {
     private static class ClientHandler implements Runnable {
 
         private final Socket clientSocket;
+        SHA sha = new SHA();
         private String Test_xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<billboard background=\"#7F3FBF\">\n<message>Billboard with custom background and default-coloured message</message>\n</billboard>";
         static Semaphore semaphore = new Semaphore(1);
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
         }
+
 
         @Override
         public void run() {
@@ -79,6 +83,9 @@ public class Main {
             try {
                 String line;
 
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
                 dOut = new DataOutputStream(clientSocket.getOutputStream());
                 dOut.writeInt(key_en.length); // write length of the message
                 DataInputStream dIn = new DataInputStream(clientSocket.getInputStream());
@@ -91,7 +98,7 @@ public class Main {
                 }
 
                 String message_s = rsa.decryptMessage_cipher(message,rsa.publicKey);
-                System.out.printf("Sent from the client: %s\n", message_s);
+                //System.out.printf("Sent from the client: %s\n", message_s);
 
                 //gen aes
                 AES aes = new AES();
@@ -109,7 +116,7 @@ public class Main {
                 byte[] decodedKey = Base64.getDecoder().decode(aes_key_en);
                 // rebuild key using SecretKeySpec
                 SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
-                System.out.println(originalKey);
+                //System.out.println(originalKey);
 
                 aes.secretKey = originalKey;
 
@@ -117,26 +124,63 @@ public class Main {
                 dOut.writeUTF(aes.encrypt(success));
 
 
+                line = "empty";
 
-                /*
-                while ((line = in.readLine()) != null) {
-                    System.out.printf("Sent from the client: %s\n", line);
-                    //out.println(line);
-                    if(line.equals("LOGIN_request")){
-                        System.out.printf("login request rev");
-                        String LOGIN_request_user = in.readLine();
-                        String LOGIN_request_pass = in.readLine();
-                        if(LOGIN_request_user.equals("Admin") && LOGIN_request_pass.equals("1234")){
-                            System.out.println("T");
-                            out.println("T");
-                        }else{
-                            System.out.println("F");
-                            out.println("F");
-                        }
+                while (!"exit".equalsIgnoreCase(line)) {
+                    line = in.readLine();
+                    if(line == null || line.equals("empty")){
+                        line = "empty";
+                    }else{
+                        System.out.printf("Sent from the client: %s\n", line);
                     }
+                    line = aes.decrypt(line);
+
+                    //out.println(line);
+
+                    if(line.equals(("LOGIN_request"))){
+                        System.out.println("login request rev");
+                        String LOGIN_request_user = aes.decrypt(in.readLine());
+                        String LOGIN_request_pass = aes.decrypt(in.readLine());
+                        String From_db = main_con.get_user_salt(LOGIN_request_user);
+                        if(From_db.equals("SQL_ERROR")){
+                            System.out.println("F");
+                            out.println(aes.encrypt("F"));
+                        }else{
+                            byte[] user_salt = Base64.getDecoder().decode(From_db);
+                            String user_pass_db = main_con.get_user_Pass(LOGIN_request_user);
+
+
+                            if(sha.encrypt(LOGIN_request_pass,user_salt).equals(user_pass_db)){
+                                System.out.println("T");
+                                out.println(aes.encrypt("T"));
+                            }else{
+                                System.out.println("F");
+                                out.println(aes.encrypt("F"));
+                            }
+                        }
+
+                    }
+                    if(line.equals(("NEW_USER_request"))){
+                        System.out.println("NEW_USER_request");
+                        String User = aes.decrypt(in.readLine());
+                        String Pass = aes.decrypt(in.readLine());
+
+                        System.out.println(User);
+                        System.out.println(Pass);
+
+                        byte[] salt = sha.getSalt();
+                        String str = Base64.getEncoder().encodeToString(salt);
+                        if(main_con.Insert_New_Current_user(User,str,sha.encrypt(Pass,salt))){
+                            out.println(aes.encrypt("T"));
+                        }else{
+                            out.println(aes.encrypt("F"));
+                        }
+
+                    }
+                     
 
                 }
-                */
+
             } catch (IOException ex) {
                 ex.printStackTrace();
             } catch (Exception e) {
@@ -147,6 +191,7 @@ public class Main {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                System.out.println("connection terminated");
             }
         }
     }

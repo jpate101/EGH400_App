@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -43,20 +45,26 @@ public class MainActivity extends AppCompatActivity {
     //private static final String ip = "0.0.0.0";
     //
 
+    public static client_con con;
+
     private int counter = 5;
 
     private String temp_UserName = "Admin";
     private String temp_Passwowrd = "1234";
     private boolean login_isValid = false;
 
+    AES aes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        client_con con = new client_con();
+        con = new client_con();
+
         con.execute();
+
+
 
     }
 
@@ -80,7 +88,15 @@ public class MainActivity extends AppCompatActivity {
         private Button elogin;
         private TextView eAttemptsInfo;
 
-        private String state = "empty";
+        private Button eRegister_Main;
+        private Button eBack_act_reg;
+
+
+
+        String state = "empty";
+        //reg new user var
+        String New_user = "empty";
+        String New_Pass = "empty";
 
         private WeakReference<MainActivity> activityWeakReference;
 
@@ -91,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
             ePassword = findViewById(R.id.et_Password);
             elogin = findViewById(R.id.btn_login);
             eAttemptsInfo = findViewById(R.id.tv_login_response);
+            eRegister_Main = findViewById(R.id.btn_registration);
+            eBack_act_reg = findViewById(R.id.btn_back_act_reg);
+
+
 
             Object server_encryptKey;
 
@@ -116,11 +136,24 @@ public class MainActivity extends AppCompatActivity {
 
             });
 
+            eRegister_Main.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent reg_page = new Intent(MainActivity.this,act_registration_Main.class);
+                    startActivity(reg_page);
+
+                }
+
+            });
+
+
 
             try (Socket socket = new Socket(ip, 12345)) {
 
                 ObjectInputStream inputStream;
                 DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+                out = new PrintWriter(socket.getOutputStream(), true);
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 DataInputStream dIn = new DataInputStream(socket.getInputStream());
                 int length = dIn.readInt();// read length of incoming message
@@ -137,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 dOut.writeInt(test.length); // write length of the message
                 dOut.write(test);
 
-                AES aes = new AES();
+                aes = new AES();
                 aes.GenerateKeys();
                 // get base64 encoded version of the key
                 String encodedKey = Base64.getEncoder().encodeToString(aes.secretKey_encoded);
@@ -170,9 +203,13 @@ public class MainActivity extends AppCompatActivity {
 
 
                 //
-                /*
-                while(state.equals("empty")){
-                    if(in.equals("EXIT")){
+
+                while(!"exit".equalsIgnoreCase(state)){
+                    if(state == null || state.equals("empty")){
+                        state = "empty";
+                    }
+
+                    if(state.equals("EXIT")){
                         break;
                     }
                     if(state.equals("LOGIN_request")){
@@ -181,12 +218,17 @@ public class MainActivity extends AppCompatActivity {
                         LOGIN_request(inputName,inputPass);
                         state = "empty";
                     }
+                    if(state.equals("NEW_USER_request")){
+
+                        NEW_USER_request(New_user,New_Pass);
+                        state = "empty";
+                    }
 
 
 
                 }
 
-                 */
+
                 scanner.close();
 
             } catch (IOException | ClassNotFoundException e) {
@@ -195,16 +237,19 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Log.e("YOUR_APP_LOG_TAG", "connection terminated");
 
             return null;
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         public void LOGIN_request(String inputName, String inputPass) throws Exception {
 
-            out.println("LOGIN_request");
-            out.println(inputName);
-            out.println(inputPass);
-            if(in.readLine().equals("T")){
+
+
+            out.println(aes.encrypt("LOGIN_request"));
+            out.println(aes.encrypt(inputName));
+            out.println(aes.encrypt(inputPass));
+            if(aes.decrypt(in.readLine()).equals("T")){
                 Intent intent = new Intent(MainActivity.this,temp_Home.class);
                 startActivity(intent);
             }else{
@@ -216,10 +261,29 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this,"login fail", Toast.LENGTH_LONG).show();
                     }
                 });
+            }
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void NEW_USER_request(String User,String Pass) throws Exception {
+
+            Log.e("YOUR_APP_LOG_TAG", "signal sent new user request");
+            out.println(aes.encrypt("NEW_USER_request"));
+            out.println(aes.encrypt(User));
+            out.println(aes.encrypt(Pass));
+
+            if(aes.decrypt(in.readLine()).equals("T")){
+                Intent reg_page = new Intent(MainActivity.this,MainActivity.class);
+                startActivity(reg_page);
+            }else{
 
 
-
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"login fail", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
 
 
