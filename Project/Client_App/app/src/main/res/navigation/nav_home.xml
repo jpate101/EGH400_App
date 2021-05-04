@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_home"
-    app:startDestination="@id/placeholder">
-
-    <fragment android:id="@+id/placeholder" />
-    <fragment android:id="@+id/placeholder2" />
-    <fragment android:id="@+id/placeholder3" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_home"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.app.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/createTeamFragment"
+        android:name="com.example.app.CreateTeamFragment"
+        android:label="fragment_create_team"
+        tools:layout="@layout/fragment_create_team" />
+    <fragment
+        android:id="@+id/messageesFragment"
+        android:name="com.example.app.MessageesFragment"
+        android:label="fragment_messagees"
+        tools:layout="@layout/fragment_messagees" />
+    <fragment
+        android:id="@+id/diaryFragment"
+        android:name="com.example.app.DiaryFragment"
+        android:label="fragment_diary"
+        tools:layout="@layout/fragment_diary" />
 </navigation>
