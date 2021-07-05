@@ -15,13 +15,15 @@
         android:theme="@style/Theme.App">
         <activity android:name=".temp_Home"></activity>
         <activity android:name=".act_registration_Main"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:label="Untitled APP">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Project_activity"/>
     </application>
 
 </manifest>

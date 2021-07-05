@@ -177,6 +177,71 @@ public class Main {
                         }
 
                     }
+                    if(line.equals(("CREATE_NEW_PROJECT"))){
+                        System.out.println("CREATE_NEW_PROJECT");
+                        String P_Name = aes.decrypt(in.readLine());
+                        String Description = aes.decrypt(in.readLine());
+                        String User = aes.decrypt(in.readLine());
+                        //search db for same entry
+                        Boolean check_1 = server_db_conection.check_for_project(P_Name);
+                        //if success
+                        System.out.println(check_1);
+                        if(check_1 == true){
+                            System.out.println("here true");
+                            out.println(aes.encrypt("T"));
+                            server_db_conection.insert_new_project(P_Name,Description,User);
+                        }else{
+                            System.out.println("here false");
+                            out.println(aes.encrypt("F"));
+                        }
+                    }
+                    if(line.equals(("GET_USER_PROJECTS"))){
+                        System.out.println("GET_USER_PROJECTS");
+                        String User = aes.decrypt(in.readLine());
+                        String[] projects = server_db_conection.get_user_projects(User);
+                        for (int i = 0; i < projects.length; i++) {
+                            //System.out.println(projects[i]);
+                            out.println(aes.encrypt(projects[i]));
+                        }
+                        out.println(aes.encrypt("end_of_String_array_n10193197"));
+                    }
+                    if(line.equals(("GET_ALL_USERS"))){
+                        System.out.println("GET_ALL_USERS");
+                        String User = aes.decrypt(in.readLine());
+                        String[] Users = server_db_conection.get_all_users(User);
+
+                        for (int i = 0; i < Users.length; i++) {
+                            //System.out.println(projects[i]);
+                            out.println(aes.encrypt(Users[i]));
+                        }
+                        out.println(aes.encrypt("end_of_String_array_n10193197"));
+                    }
+                    if(line.equals(("ASSIGN_USER_TO_PROJECT"))){
+                        System.out.println("ASSIGN_USER_TO_PROJECT");
+                        String User = aes.decrypt(in.readLine());
+                        String New_User = aes.decrypt(in.readLine());
+                        String Project = aes.decrypt(in.readLine());
+
+                        System.out.println(User);
+                        System.out.println(New_User);
+                        System.out.println(Project);
+
+                        String check = server_db_conection.insert_user_into_project(User,New_User,Project);
+                        if(check.equals("T")){
+                            out.println(aes.encrypt("T"));
+                        } else if (check.equals("error check permission")) {
+                            out.println(aes.encrypt("error check permission"));
+                        }else if (check.equals("error inserting new user")){
+                            out.println(aes.encrypt("error inserting new user"));
+                        } else if (check.equals("need permission")){
+                            out.println(aes.encrypt("need permission"));
+                        }else{
+                            out.println(aes.encrypt("unknown error"));
+                        }
+
+                    }
+
+
                      
 
                 }

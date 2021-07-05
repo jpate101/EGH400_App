@@ -1,19 +1,31 @@
 package com.example.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements recyclerAdapter.OnProjectListener {
+    private recyclerAdapter.RecyclerViewClickListener listener;
+    private static ArrayList<Project_Names_list> projectsList;
+    private RecyclerView recyclerView;
+    public static String[] Projects;
+    public static Semaphore s = new java.util.concurrent.Semaphore(0);
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,11 +66,59 @@ public class HomeFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    private static View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
+        //get projects
+        MainActivity.con.state = "GET_USER_PROJECTS";
+        //
+        recyclerView = view.findViewById(R.id.listRev_1);
+        projectsList = new ArrayList<>();
+        try {
+            setProjectinfo();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        setAdapter();
+
+        return view;
+    }
+
+    private void setAdapter() {
+        recyclerAdapter adapter = new recyclerAdapter(projectsList,listener,this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapter);
+    }
+
+
+
+    private void setProjectinfo() throws InterruptedException {
+        //String[] Projects = new String[] { "Orange", "Apple", "Pear", "Strawberry" , "Strawberry" , "Strawberry" , "testing project 1 and some more words and stuff" };
+        //waitUntilDone();
+        for (int i = 0; i < Projects.length; i++) {
+            projectsList.add(new Project_Names_list(Projects[i]));
+        }
+    }
+    public static void setDone() {
+        s.release();
+    }
+
+    public static void waitUntilDone() throws InterruptedException {
+        s.acquire();
+    }
+
+    @Override
+    public void onProjectClick(int position) {
+        //Intent intent = new Intent(MainActivity.this,temp_Home.class);
+        //projectsList.get(position);
+        Intent intent = new Intent(getActivity(), Project_activity.class);
+        startActivity(intent);
     }
 }

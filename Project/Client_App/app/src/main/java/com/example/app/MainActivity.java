@@ -32,12 +32,12 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Scanner;
 
 
 public class MainActivity extends AppCompatActivity {
-
     //
     String message = "";
     private static final int SERVERPORT = 12345;
@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         con = new client_con();
 
         con.execute();
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*
     private boolean login_valid(String User, String Pass){
         if(User.equals(temp_UserName) && Pass.equals(temp_Passwowrd)){
             return true;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    */
     class client_con extends AsyncTask<Void,Void,Void>{
 
 
@@ -91,12 +95,21 @@ public class MainActivity extends AppCompatActivity {
         private Button eRegister_Main;
         private Button eBack_act_reg;
 
+        private String USER_id;
+
+        public ObjectInputStream ois;
+
+        String Currently_selected_project_view = "no project selected";
+
 
 
         String state = "empty";
         //reg new user var
         String New_user = "empty";
         String New_Pass = "empty";
+        String Project_Name;
+        String Project_Description;
+
 
         private WeakReference<MainActivity> activityWeakReference;
 
@@ -149,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
 
 
             try (Socket socket = new Socket(ip, 12345)) {
-
                 ObjectInputStream inputStream;
                 DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
                 out = new PrintWriter(socket.getOutputStream(), true);
@@ -183,27 +195,6 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.e("YOUR_APP_LOG_TAG", aes.decrypt(dIn.readUTF()));
 
-
-                /*
-
-                AES aes = new AES();
-                aes.GenerateKeys();
-
-                // get base64 encoded version of the key
-                String encodedKey = Base64.getEncoder().encodeToString(aes.secretKey.getEncoded());
-
-                //rsa encryption
-                byte[] encodedKey_en = RSA.encryptMessage_cipher(encodedKey,ret);
-
-                dOut.writeInt(encodedKey_en.length); // write length of the message
-                dOut.write(encodedKey_en);
-
-                 */
-
-
-
-                //
-
                 while(!"exit".equalsIgnoreCase(state)){
                     if(state == null || state.equals("empty")){
                         state = "empty";
@@ -216,11 +207,32 @@ public class MainActivity extends AppCompatActivity {
                         String inputName = eName.getText().toString();
                         String inputPass = ePassword.getText().toString();
                         LOGIN_request(inputName,inputPass);
-                        state = "empty";
+                        //state = "empty";
+                        state = "GET_USER_PROJECTS";
                     }
                     if(state.equals("NEW_USER_request")){
-
                         NEW_USER_request(New_user,New_Pass);
+                        state = "empty";
+                    }
+                    if(state.equals("CREATE_NEW_PROJECT")){
+                        Log.e("YOUR_APP_LOG_TAG", "Create new project sig "+ USER_id);
+                        CREATE_NEW_PROJECT(Project_Name, Project_Description);
+                        state = "empty";
+                    }
+                    if(state.equals("GET_USER_PROJECTS")){
+                        //HomeFragment.Projects =
+                        Log.e("YOUR_APP_LOG_TAG", "get user projects "+ USER_id);
+                        GET_USER_PROJECTS();
+                        state = "empty";
+                    }
+                    if(state.equals("GET_ALL_USERS")){
+                        Log.e("YOUR_APP_LOG_TAG", "get all users"+ USER_id);
+                        GET_ALL_USERS();
+                        state = "empty";
+                    }
+                    if(state.equals("ASSIGN_USER_TO_PROJECT")){
+                        Log.e("YOUR_APP_LOG_TAG", "ASSIGN_USER_TO_PROJECT"+ USER_id);
+                        ASSIGN_USER_TO_PROJECT();
                         state = "empty";
                     }
 
@@ -252,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
             if(aes.decrypt(in.readLine()).equals("T")){
                 Intent intent = new Intent(MainActivity.this,temp_Home.class);
                 startActivity(intent);
+                USER_id = inputName;
             }else{
 
 
@@ -286,6 +299,127 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void CREATE_NEW_PROJECT(String P_Name, String Description) throws Exception {
+            Log.e("YOUR_APP_LOG_TAG", "signal sent new user request");
+            out.println(aes.encrypt("CREATE_NEW_PROJECT"));
+            out.println(aes.encrypt(P_Name));
+            out.println(aes.encrypt(Description));
+            out.println(aes.encrypt(USER_id));
+            if(aes.decrypt(in.readLine()).equals("T")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Project has been created", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Project Name is taken please selected new name", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void GET_USER_PROJECTS() throws Exception {
+            out.println(aes.encrypt("GET_USER_PROJECTS"));
+            out.println(aes.encrypt(USER_id));
+            boolean check1 = true;
+            String check2;
+            ArrayList list = new ArrayList();
+            while(check1){
+                check2 = aes.decrypt(in.readLine());
+                //System.out.println(test);
+                Log.e("YOUR_APP_LOG_TAG", check2);
+
+                if(check2.equals("end_of_String_array_n10193197")){
+                    break;
+                }
+                list.add(check2);
+            }
+            String[] temp_store = (String[]) list.toArray(new String[list.size()]);
+            Log.e("YOUR_APP_LOG_TAG", "end of get user projects");
+            HomeFragment.Projects = new String[temp_store.length];
+            HomeFragment.Projects = temp_store;
+            //HomeFragment.setDone();
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void GET_ALL_USERS() throws IOException {
+            out.println(aes.encrypt("GET_ALL_USERS"));
+            out.println(aes.encrypt(USER_id));
+
+            boolean check1 = true;
+            String check2;
+            ArrayList list = new ArrayList();
+            ArrayList<User_object_add_user> User_List_obj_temp = new ArrayList<User_object_add_user>();
+            while(check1){
+                check2 = aes.decrypt(in.readLine());
+                if(check2.equals("end_of_String_array_n10193197")){
+                    break;
+                }
+                //System.out.println(test);
+                Log.e("YOUR_APP_LOG_TAG", check2);
+                User_object_add_user test_u = new User_object_add_user(check2);
+                if(check2.equals(USER_id)){
+
+                }else{
+                    P_addUser.User_List_obj.add(test_u);
+                }
+                list.add(check2);
+            }
+            String[] temp_store = (String[]) list.toArray(new String[list.size()]);
+            Log.e("YOUR_APP_LOG_TAG", "end of get all users");
+
+
+
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void ASSIGN_USER_TO_PROJECT() throws IOException {
+            out.println(aes.encrypt("ASSIGN_USER_TO_PROJECT"));
+            out.println(aes.encrypt(USER_id));
+            out.println(aes.encrypt(P_addUser.new_user_to_project));
+            out.println(aes.encrypt(Currently_selected_project_view));
+            String response = aes.decrypt(in.readLine());
+            if(response.equals("T")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Success", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } else if (response.equals("error check permission")) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"user is not permitted to take this action", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }else if (response.equals("error inserting new user")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"unable to add user", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } else if (response.equals("need permission")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"User is not permitted to take this action", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Unknown Error", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
 
         }
     }

@@ -75,6 +75,24 @@ public class db_query_dev {
         System.out.println(sha.encrypt("pass",byteArr));
 
          */
+        /*
+        //testing check for projects
+        System.out.println(server_db_conection.check_for_project("Sample_project_1"));
+        System.out.println(server_db_conection.check_for_project("Sample_project_2"));
+
+         */
+
+        //server_db_conection.insert_new_project("Sample Project 2","SAmple description","Admin");
+        //String[] Projects = new String[] {"Hello", "World","Testing Project 1","Testing Project 2","Testing Project 3"};
+        //System.out.println(Projects[0]);
+        //System.out.println(Projects[1]);
+        //System.out.println(Projects[2]);
+
+        //server_db_conection.get_user_projects("Admin");
+
+        //server_db_conection.get_all_users("Admin");
+        System.out.println(server_db_conection.insert_user_into_project("josh","Admin","test3"));
+        System.out.println(server_db_conection.insert_user_into_project("Admin","josh","test2"));
 
     }
 }
