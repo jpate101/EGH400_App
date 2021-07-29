@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+/**
+ * registration page java file
+ */
 public class act_registration_Main extends Activity {
 
     private Button eBack_act_reg;
@@ -40,7 +43,6 @@ public class act_registration_Main extends Activity {
                 startActivity(reg_page);
             }
         });
-
         eReg_new_user.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -56,6 +58,7 @@ public class act_registration_Main extends Activity {
 
                         MainActivity.con.New_user = inputName;
                         MainActivity.con.New_Pass = inputPass;
+                        //send new user request to server
                         MainActivity.con.state = "NEW_USER_request";
 
                     }else{

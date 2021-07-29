@@ -12,6 +12,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+/**
+ * inflate home activity after login
+ */
 public class act_Home {
 
     public class balance extends AppCompatActivity {

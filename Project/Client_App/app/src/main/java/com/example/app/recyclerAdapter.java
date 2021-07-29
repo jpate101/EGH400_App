@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+/**
+ * adapter class for projects list in fragment_home.xml
+ */
 public class recyclerAdapter extends RecyclerView.Adapter<recyclerAdapter.myViewHolder> {
 
-    //private RecyclerViewClickListener listener;
     private OnProjectListener mOnProjectListener;
     private ArrayList<Project_Names_list> Projects;
     public recyclerAdapter(ArrayList<Project_Names_list> Projects, RecyclerViewClickListener listener,OnProjectListener onProjectListener){

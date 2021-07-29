@@ -12,6 +12,9 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
+/**
+ * adapter for users recycler view in add users to project tab
+ */
 public class User_object_adapter extends ArrayAdapter<User_object_add_user> {
     public User_object_adapter(@NonNull Context context, int resource, List<User_object_add_user> userList) {
         super(context, resource, userList);

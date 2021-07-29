@@ -1,5 +1,6 @@
 package com.example.app;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -65,6 +66,7 @@ public class P_Home extends Fragment {
         View v =  inflater.inflate(R.layout.fragment_p_home, container, false);
         TextView tv = v.findViewById(R.id.p_home);
         tv.setText(MainActivity.con.Currently_selected_project_view);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         return v;
     }
 }

@@ -3,7 +3,10 @@ package com.company;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
 public class server_db_conection {
 
@@ -92,14 +95,25 @@ public class server_db_conection {
         return false;
     }
     public static void insert_new_project(String P_name,String Des,String User) throws SQLException {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        System.out.println(formatter.format(date));
+
+        String start_D = formatter.format(date);
+        start_D = "STR_TO_DATE(\'"+start_D+"\',\'%d/%m/%Y\')";
+
+
         Statement stmt = myConn.createStatement();
-        String query = "INSERT INTO projects (Project_Name, Created_By, Description)\n" +
-                "VALUES (\""+P_name+"\", \""+User+"\",\""+Des+"\");";
+        String query = "INSERT INTO projects (Project_Name, Created_By, Description,Project_Creation_date)\n" +
+                "VALUES (\""+P_name+"\", \""+User+"\",\""+Des+"\","+start_D+");";
         ResultSet rs = stmt.executeQuery(query);
         query = "INSERT INTO people_per_project (Project, User, Role)\n" +
                 "VALUES (\""+P_name+"\", \""+User+"\",1);";
         rs = stmt.executeQuery(query);
-    }
+        query = "INSERT INTO people_per_project (Project, User, Role)\n" +
+                "VALUES (\""+P_name+"\", \""+"!No User Selected"+"\",2);";
+        rs = stmt.executeQuery(query);    }
     public static String[] get_user_projects(String User) throws SQLException {
         Statement stmt = myConn.createStatement();
         String query = "SELECT Project FROM people_per_project WHERE User=\""+User+"\"";
@@ -169,4 +183,113 @@ public class server_db_conection {
         }
 
     }
+
+    public static String[] get_all_users_in_project(String project) throws SQLException {
+        System.out.println(project);
+
+        Statement stmt = myConn.createStatement();
+        String query = "SELECT Project,User,Role FROM people_per_project WHERE Project=\""+project+"\"";
+        ResultSet rs = stmt.executeQuery(query);
+
+
+        int i = 0;
+        ArrayList list = new ArrayList();
+
+        while (rs.next()) {
+
+            String test = rs.getString("User");
+            //System.out.println(test);
+            list.add(test);
+        }
+        String[] array = (String[]) list.toArray(new String[list.size()]);
+        //System.out.println(array.length);
+        return array;
+        //String[] test = {"Hello", "World","test","testing"};
+        //return test;
+    }
+
+    public static boolean insert_task_into_project(String Task_name,String Project,String Assign_User,String Created_By,String start_D,String end_D,String Des) {
+        start_D = start_D.substring(7);
+        end_D = end_D.substring(5);
+
+        if (start_D.charAt(1) == '/') start_D = "0" + start_D;
+        if (start_D.charAt(4) == '/') start_D = start_D.substring(0,3) + "0" + start_D.substring(3);
+
+        start_D = "STR_TO_DATE(\'"+start_D+"\',\'%d/%m/%Y\')";
+        end_D = "STR_TO_DATE(\'"+end_D+"\',\'%d/%m/%Y\')";
+
+
+
+
+        try{
+            Statement stmt = myConn.createStatement();
+
+            // eg TO_DATE('17/12/2015', 'DD/MM/YYYY')
+            String query = "INSERT INTO tasks (Task_name, Project, Assigned_User,Created_By,Status_int,start_date,end_date,Description) VALUES (\""+Task_name+"\",\""+Project+"\",\""+Assign_User+"\",\""+Created_By+"\",\""+String.valueOf(1)+"\","+start_D+","+end_D+",\""+Des+"\");";
+            ResultSet rs = stmt.executeQuery(query);
+            return true;
+        }catch (SQLException e ){
+            System.out.println(e);
+            return false;
+        }
+        /*
+        status
+        1 = in Progress
+        2 = Resolved
+        3 = Canceled
+         */
+    }
+    public static String[] get_project_tasks(String Project) throws SQLException {
+        //project creation date
+        Statement stmt2 = myConn.createStatement();
+        String query2 = "SELECT Project_Name,Project_Creation_date FROM projects WHERE Project_Name=\""+Project+"\"";
+        ResultSet rs2 = stmt2.executeQuery(query2);
+
+        int i = 0;
+        ArrayList list = new ArrayList();
+
+        while (rs2.next()) {
+
+            String test = rs2.getString("Project_Creation_date");
+            System.out.println(test);
+            list.add(test);
+        }
+        //String[] array = (String[]) list.toArray(new String[list.size()]);
+        //System.out.println(array);
+
+
+        //get project tasks
+        Statement stmt = myConn.createStatement();
+        String query = "SELECT Task_Name,Status_int,start_date,end_date FROM tasks WHERE Project=\""+Project+"\"ORDER BY end_date ASC";
+        ResultSet rs = stmt.executeQuery(query);
+
+        i = 0;
+        //list = new ArrayList();
+
+        while (rs.next()) {
+
+            String test = rs.getString("Task_Name");
+            String test2 = rs.getString("Status_int");
+            String test3 = rs.getString("start_date");
+            String test4 = rs.getString("end_date");
+            String test5 = "___________";
+            System.out.println(test);
+            System.out.println(test2);
+            System.out.println(test3);
+            System.out.println(test4);
+            System.out.println(test5);
+            list.add(test);
+            list.add(test2);
+            list.add(test3);
+            list.add(test4);
+            //list.add(test5);
+        }
+        String[] array = (String[]) list.toArray(new String[list.size()]);
+        System.out.println(Arrays.toString(array));
+        System.out.println(array.length);
+
+        return array;
+    }
+
+
 }

@@ -1,5 +1,8 @@
 package com.example.app;
 
+/**
+ * class represent a user
+ */
 public class User_object_add_user {
     private String Name;
 

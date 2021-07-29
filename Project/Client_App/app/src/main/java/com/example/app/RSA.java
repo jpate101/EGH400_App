@@ -19,6 +19,9 @@ import java.util.Map;
 
 import javax.crypto.Cipher;
 
+/**
+ * RSA key exchange class
+ */
 public class RSA {
 
     public static PrivateKey privateKey;
@@ -34,7 +37,13 @@ public class RSA {
     }
 
 
-
+    /**
+     * unused function only use by server
+     * @param encryptedText
+     * @param publicKey
+     * @return
+     * @throws Exception
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String decryptMessage_cipher(byte[] encryptedText , PublicKey publicKey) throws Exception {
 
@@ -45,6 +54,10 @@ public class RSA {
         //return new String(plainText);
     }
 
+    /**
+     * unused function only use by server
+     * @throws Exception
+     */
     public static void getRSAKeys() throws Exception {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(3072);

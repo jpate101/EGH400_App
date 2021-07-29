@@ -24,6 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Project_activity"/>
+        <activity android:name=".Task_Page"/>
+
     </application>
 
 </manifest>

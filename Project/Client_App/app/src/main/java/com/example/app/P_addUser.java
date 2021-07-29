@@ -1,6 +1,7 @@
 package com.example.app;
 
 import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -93,6 +94,7 @@ public class P_addUser extends Fragment {
 
 
         //
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         return v;
     }
 

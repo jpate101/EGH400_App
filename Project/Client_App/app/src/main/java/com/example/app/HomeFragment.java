@@ -19,6 +19,8 @@ import java.util.concurrent.Semaphore;
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * fill act_home.java/activity_home.xml activity home tab fragment
  */
 public class HomeFragment extends Fragment implements recyclerAdapter.OnProjectListener {
     private recyclerAdapter.RecyclerViewClickListener listener;

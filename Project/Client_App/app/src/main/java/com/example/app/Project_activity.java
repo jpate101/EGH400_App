@@ -13,6 +13,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
+/**
+ * inflates individual projects activity
+ */
 public class Project_activity extends AppCompatActivity {
 
     @Override
@@ -23,12 +26,5 @@ public class Project_activity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bnv_project);
         NavController navController = Navigation.findNavController(this,  R.id.fragment_projects_main);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
-
-
-        
     }
-
-
-
 }

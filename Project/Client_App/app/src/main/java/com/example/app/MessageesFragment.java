@@ -12,6 +12,8 @@ import android.view.ViewGroup;
  * A simple {@link Fragment} subclass.
  * Use the {@link MessageesFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * fill act_home.java/activity_home.xml activity messagesFragment tab fragment
  */
 public class MessageesFragment extends Fragment {
 

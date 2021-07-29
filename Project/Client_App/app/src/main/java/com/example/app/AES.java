@@ -17,6 +17,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * AES-256 encryption
+ */
 public class AES {
     public static SecretKey secretKey;
     public static byte[] secretKey_encoded;
@@ -30,6 +33,10 @@ public class AES {
         secretKey = (SecretKey) aes_key;
     }
 
+    /**
+     * generate random keys
+     * @throws Exception
+     */
     public static void GenerateKeys() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(256); // for example

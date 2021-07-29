@@ -91,8 +91,11 @@ public class db_query_dev {
         //server_db_conection.get_user_projects("Admin");
 
         //server_db_conection.get_all_users("Admin");
-        System.out.println(server_db_conection.insert_user_into_project("josh","Admin","test3"));
-        System.out.println(server_db_conection.insert_user_into_project("Admin","josh","test2"));
+        //System.out.println(server_db_conection.insert_user_into_project("josh","Admin","test3"));
+        //System.out.println(server_db_conection.insert_user_into_project("Admin","josh","test2"));
+        //System.out.println(server_db_conection.insert_task_into_project());
+
+        server_db_conection.get_project_tasks("Sample Project 2");
 
     }
 }

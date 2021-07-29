@@ -238,6 +238,49 @@ public class Main {
                         }else{
                             out.println(aes.encrypt("unknown error"));
                         }
+                    }
+                    if(line.equals(("GET_ALL_USERS_IN_PROJECT"))){
+                        System.out.println("GET_ALL_USERS_IN_PROJECT");
+                        String project = aes.decrypt(in.readLine());
+                        String[] Users = server_db_conection.get_all_users_in_project(project);
+
+                        for (int i = 0; i < Users.length; i++) {
+                            //System.out.println(projects[i]);
+                            out.println(aes.encrypt(Users[i]));
+                        }
+                        out.println(aes.encrypt("end_of_String_array_n10193197"));
+
+                    }
+                    if(line.equals(("INSERT_NEW_TASK"))){
+                        System.out.println("INSERT_NEW_TASK");
+                        String TaskName = aes.decrypt(in.readLine());
+                        String TaskDes = aes.decrypt(in.readLine());
+                        String Task_start = aes.decrypt(in.readLine());
+                        String Task_end = aes.decrypt(in.readLine());
+                        String Task_User = aes.decrypt(in.readLine());
+                        String Project = aes.decrypt(in.readLine());
+                        String Created_by = aes.decrypt(in.readLine());
+
+                        boolean response = server_db_conection.insert_task_into_project(TaskName,Project,Task_User,Created_by,Task_start,Task_end,TaskDes);
+                        System.out.println(response);
+                        if(response){
+                            out.println(aes.encrypt("T"));
+                        }else{
+                            out.println(aes.encrypt("F"));
+                        }
+                    }
+                    if(line.equals(("GET_PROJECT_TASK_INFORMATION"))){
+                        System.out.println("GET_PROJECT_TASK_INFORMATION");
+                        String Project = aes.decrypt(in.readLine());
+
+                        String[] results = server_db_conection.get_project_tasks(Project);
+
+                        for (int i = 0; i < results.length; i++) {
+                            //System.out.println(projects[i]);
+                            out.println(aes.encrypt(results[i]));
+                        }
+                        out.println(aes.encrypt("end_of_String_array_n10193197"));
+
 
                     }
 
