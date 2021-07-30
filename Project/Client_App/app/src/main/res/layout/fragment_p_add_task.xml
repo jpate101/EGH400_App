@@ -63,6 +63,7 @@
                 android:textSize="30dp"
                 tools:ignore="MissingConstraints" />
 
+
             <TextView
                 android:id="@+id/tvDateEnd"
                 android:layout_width="match_parent"
@@ -73,8 +74,6 @@
                 android:textAlignment="center"
                 android:textSize="30dp"
                 tools:ignore="MissingConstraints" />
-
-
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
@@ -102,7 +101,7 @@
                         android:id="@+id/textView5"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Selected User below"
+                        android:text="Selected User of Task below"
                         android:textColor="@color/black"
                         android:textSize="20dp"
                         android:textAlignment="center"/>
