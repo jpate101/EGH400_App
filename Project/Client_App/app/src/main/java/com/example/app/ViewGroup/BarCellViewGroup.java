@@ -61,6 +61,12 @@ public class BarCellViewGroup extends FrameLayout implements TableFixHeaderAdapt
             card_item.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_blue_dark));
         }else if(strings.get(col).equals("current_week")){
             card_item.setBackgroundResource(R.drawable.border_current);
+        }else if(strings.get(col).equals("overtime")){
+            card_item.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_orange_dark));
+        }else if(strings.get(col).equals("complete & current_week")){
+            card_item.setBackgroundResource(R.drawable.border_current_week_complete);
+        }else if(strings.get(col).equals("complete")){
+            card_item.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_green_light));
         }else{
             card_item.setBackgroundResource(R.drawable.border);
         }

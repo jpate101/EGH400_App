@@ -9,16 +9,22 @@ public class GanttItem {
     private String taskName;
     private boolean isError,isEmpty;
     private Point point;
+    private int status;
 
-    public GanttItem(String taskName, boolean isError, Point point) {
+    public GanttItem(String taskName, boolean isError, Point point, int status) {
         this.taskName = taskName;
         this.isError = isError;
         this.point = point;
+        this.status = status;
     }
 
     public GanttItem(String taskName, boolean isEmpty) {
         this.taskName = taskName;
         this.isEmpty = isEmpty;
+    }
+
+    public int getStatus() {
+        return status;
     }
 
     public String getTaskName() {

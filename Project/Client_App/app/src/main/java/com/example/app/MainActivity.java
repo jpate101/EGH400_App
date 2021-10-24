@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     String message = "";
     private static final int SERVERPORT = 12345;
     private static final String ip = "192.168.0.6";//server ip address
+    //private static final String ip = "172.16.11.249";//server ip address gab
     //
 
     public static client_con con;
@@ -66,15 +67,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-
         con = new client_con();
-
         con.execute();
-
-
-
     }
 
     /**
@@ -241,6 +235,11 @@ public class MainActivity extends AppCompatActivity {
                         GET_ALL_USERS_IN_PROJECT();
                         state = "empty";
                     }
+                    if(state.equals("GET_ALL_USERS_IN_PROJECT_TASKPAGE")){
+                        Log.e("YOUR_APP_LOG_TAG", "GET_ALL_USERS_IN_PROJECT_TASKPAGE"+ Currently_selected_project_view);
+                        GET_ALL_USERS_IN_PROJECT_TASKPAGE();
+                        state = "empty";
+                    }
                     if(state.equals("INSERT_NEW_TASK")){
                         Log.e("YOUR_APP_LOG_TAG", "INSET_NEW_TASK"+ Currently_selected_project_view);
                         INSERT_NEW_TASK();
@@ -249,6 +248,31 @@ public class MainActivity extends AppCompatActivity {
                     if(state.equals("GET_PROJECT_TASK_INFORMATION")){
                         Log.e("YOUR_APP_LOG_TAG", "GET_PROJECT_TASK_INFORMATION"+ Currently_selected_project_view);
                         GET_PROJECT_TASK_INFORMATION();
+                        state = "empty";
+                    }
+                    if(state.equals("GET_TASK_INFO")){
+                        Log.e("YOUR_APP_LOG_TAG", "GET_TASK_INFO");
+                        GET_TASK_INFO();
+                        state = "empty";
+                    }
+                    if(state.equals("UPDATE_TASK_STATUS")){
+                        Log.e("YOUR_APP_LOG_TAG", "UPDATE_TASK_STATUS");
+                        UPDATE_TASK_STATUS();
+                        state = "empty";
+                    }
+                    if(state.equals("GET_ALL_USERS_2")){
+                        Log.e("YOUR_APP_LOG_TAG", "get all users 2"+ USER_id);
+                        GET_ALL_USERS2();
+                        state = "empty";
+                    }
+                    if(state.equals("INSERT_NEW_MINOR_TASK")){
+                        Log.e("YOUR_APP_LOG_TAG", "INSERT_NEW_MINOR_TASK"+ USER_id);
+                        INSERT_NEW_MINOR_TASK();
+                        state = "empty";
+                    }
+                    if(state.equals("GET_PROJECT_MINOR_TASK_INFORMATION")){
+                        Log.e("YOUR_APP_LOG_TAG", "GET_PROJECT_MINOR_TASK_INFORMATION"+ Currently_selected_project_view);
+                        GET_PROJECT_MINOR_TASK_INFORMATION();
                         state = "empty";
                     }
 
@@ -361,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e("YOUR_APP_LOG_TAG", "end of get user projects");
             HomeFragment.Projects = new String[temp_store.length];
             HomeFragment.Projects = temp_store;
+            HomeFragment.check1 = true;
             //HomeFragment.setDone();
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -389,9 +414,6 @@ public class MainActivity extends AppCompatActivity {
             }
             String[] temp_store = (String[]) list.toArray(new String[list.size()]);
             Log.e("YOUR_APP_LOG_TAG", "end of get all users");
-
-
-
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         public void ASSIGN_USER_TO_PROJECT() throws IOException {
@@ -457,6 +479,30 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("YOUR_APP_LOG_TAG", check2);
                 User_object_add_user test_u = new User_object_add_user(check2);
                 P_addTask.User_List_obj.add(test_u);
+                list.add(check2);
+            }
+            String[] temp_store = (String[]) list.toArray(new String[list.size()]);
+            Log.e("YOUR_APP_LOG_TAG", "end of get all users");
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void GET_ALL_USERS_IN_PROJECT_TASKPAGE() throws IOException, InterruptedException {
+
+            out.println(aes.encrypt("GET_ALL_USERS_IN_PROJECT"));
+            out.println(aes.encrypt(Currently_selected_project_view));
+
+            boolean check1 = true;
+            String check2;
+            ArrayList list = new ArrayList();
+            ArrayList<User_object_add_user> User_List_obj_temp = new ArrayList<User_object_add_user>();
+            while(check1){
+                check2 = aes.decrypt(in.readLine());
+                if(check2.equals("end_of_String_array_n10193197")){
+                    break;
+                }
+                //System.out.println(test);
+                Log.e("YOUR_APP_LOG_TAG", check2);
+                User_object_add_user test_u = new User_object_add_user(check2);
+                Task_Page.User_List_obj.add(test_u);
                 list.add(check2);
             }
             String[] temp_store = (String[]) list.toArray(new String[list.size()]);
@@ -541,6 +587,155 @@ public class MainActivity extends AppCompatActivity {
             //Log.e("YOUR_APP_LOG_TAG", String.valueOf(Project_Tasks.get(0).Start));
             //Log.e("YOUR_APP_LOG_TAG", String.valueOf(Project_Tasks.get(0).End));
             Log.e("YOUR_APP_LOG_TAG", "end of GET_PROJECT_TASK_INFORMATION");
+            //Project_Tasks.sort();
+            P_overview.check1 = true;
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void  GET_TASK_INFO() throws IOException {
+            Log.e("YOUR_APP_LOG_TAG", "GET_TASK_INFO "+Currently_selected_project_view+P_overview.task_name.getText().toString());
+            out.println(aes.encrypt("GET_TASK_INFO"));
+            out.println(aes.encrypt(Currently_selected_project_view));
+            out.println(aes.encrypt(P_overview.task_name.getText().toString()));
+
+            P_overview.sel_task = P_overview.task_name.getText().toString();
+
+            Task_Page.Des = aes.decrypt(in.readLine());
+            Task_Page.Status = aes.decrypt(in.readLine());
+            Task_Page.Assigned_user = aes.decrypt(in.readLine());
+            Task_Page.s_date = aes.decrypt(in.readLine());
+            Task_Page.e_date = aes.decrypt(in.readLine());
+            Task_Page.e_taskname = aes.decrypt(in.readLine());
+
+            Task_Page.check1 = true;
+            Log.e("YOUR_APP_LOG_TAG", "GET_TASK_INFO "+Task_Page.e_taskname);
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void  UPDATE_TASK_STATUS() throws IOException {
+            Log.e("YOUR_APP_LOG_TAG", "UPDATE_TASK_STATUS");
+            out.println(aes.encrypt("UPDATE_TASK_STATUS"));
+            out.println(aes.encrypt(Currently_selected_project_view));
+            out.println(aes.encrypt(P_overview.task_name.getText().toString()));
+            out.println(aes.encrypt(Task_Page.selected_radio_option));
+
+            if(aes.decrypt(in.readLine()).equals("T")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Status Update Successful", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Status Update Fail", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void GET_ALL_USERS2() throws IOException {
+            out.println(aes.encrypt("GET_ALL_USERS"));
+            out.println(aes.encrypt(USER_id));
+
+            boolean check1 = true;
+            String check2;
+            ArrayList list = new ArrayList();
+            ArrayList<User_object_add_user> User_List_obj_temp = new ArrayList<User_object_add_user>();
+            while(check1){
+                check2 = aes.decrypt(in.readLine());
+                if(check2.equals("end_of_String_array_n10193197")){
+                    break;
+                }
+                //System.out.println(test);
+                Log.e("YOUR_APP_LOG_TAG", check2);
+                User_object_add_user test_u = new User_object_add_user(check2);
+                if(check2.equals(USER_id)){
+
+                }else{
+                    MessageesFragment.User_List_obj.add(test_u);
+                }
+                list.add(check2);
+            }
+            String[] temp_store = (String[]) list.toArray(new String[list.size()]);
+            Log.e("YOUR_APP_LOG_TAG", "end of get all users");
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void INSERT_NEW_MINOR_TASK() throws IOException {
+            out.println(aes.encrypt("INSERT_NEW_MINOR_TASK"));
+            out.println(aes.encrypt(Task_Page.e_taskname));
+            out.println(aes.encrypt(Task_Page.task_name.getText().toString()));
+
+            String TASK_DES = Task_Page.task_des.getText().toString();
+            if(TASK_DES == null){
+                TASK_DES = "No Description Provided";
+            }else if(TASK_DES.isEmpty()){
+                TASK_DES = "No Description Provided";
+            }
+            out.println(aes.encrypt(TASK_DES));
+            out.println(aes.encrypt(Task_Page.task_start.getText().toString()));
+            out.println(aes.encrypt(Task_Page.task_end.getText().toString()));
+            String Assigned_User = Task_Page.select_user;
+            if(Assigned_User == null){
+                Assigned_User = "No Assigned User";
+            }else if(Assigned_User.isEmpty()){
+                Assigned_User = "No Assigned User";
+            }
+            out.println(aes.encrypt(Assigned_User));
+            out.println(aes.encrypt(Currently_selected_project_view));
+            out.println(aes.encrypt(USER_id));
+
+
+
+
+
+            String response = aes.decrypt(in.readLine());
+            if(response.equals("T")){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"minor Task Added to Project", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this,"Unable to add minor Task", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        public void  GET_PROJECT_MINOR_TASK_INFORMATION() throws IOException, ParseException {
+
+            Project_Tasks = new ArrayList<Task_Object>();
+            out.println(aes.encrypt("GET_PROJECT_MINOR_TASK_INFORMATION"));
+            out.println(aes.encrypt(Currently_selected_project_view));
+            out.println(aes.encrypt(Task_Page.e_taskname));
+
+            boolean check1 = true;
+            int count = 0;
+            while(check1){
+                String Task_Name = aes.decrypt(in.readLine());
+                if(Task_Name.equals("end_of_String_array_n10193197")){
+                    Log.e("YOUR_APP_LOG_TAG", "end of GET_PROJECT_MINOR_TASK_INFORMATION");
+                    break;
+                }
+                int Status = Integer.parseInt(aes.decrypt(in.readLine()));
+                String temp_start_date = aes.decrypt(in.readLine());
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                Date start_date = format.parse(temp_start_date);
+
+                String temp_end_date = aes.decrypt(in.readLine());
+                DateFormat format2 = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                Date end_date = format2.parse(temp_end_date);
+                Project_Tasks.add(new Task_Object(Task_Name,Status,start_date,end_date));
+                count++;
+                Log.e("YOUR_APP_LOG_TAG", " GET_PROJECT_MINOR_TASK_INFORMATION here \n");
+            }
             //Project_Tasks.sort();
             P_overview.check1 = true;
         }

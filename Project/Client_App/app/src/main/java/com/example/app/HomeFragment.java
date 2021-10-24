@@ -28,6 +28,7 @@ public class HomeFragment extends Fragment implements recyclerAdapter.OnProjectL
     private RecyclerView recyclerView;
     public static String[] Projects;
     public static Semaphore s = new java.util.concurrent.Semaphore(0);
+    public static boolean check1 = false;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -103,9 +104,18 @@ public class HomeFragment extends Fragment implements recyclerAdapter.OnProjectL
 
     private void setProjectinfo() throws InterruptedException {
         //String[] Projects = new String[] { "Orange", "Apple", "Pear", "Strawberry" , "Strawberry" , "Strawberry" , "testing project 1 and some more words and stuff" };
-        //waitUntilDone();
-        for (int i = 0; i < Projects.length; i++) {
-            projectsList.add(new Project_Names_list(Projects[i]));
+        while(check1 == false){
+            if(check1 == true){
+                break;
+            }
+        }
+        check1 = false;
+        if(projectsList == null){
+            projectsList.add(new Project_Names_list("no projects in list"));
+        }else {
+            for (int i = 0; i < Projects.length; i++) {
+                projectsList.add(new Project_Names_list(Projects[i]));
+            }
         }
     }
     public static void setDone() {

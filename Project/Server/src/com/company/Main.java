@@ -280,13 +280,74 @@ public class Main {
                             out.println(aes.encrypt(results[i]));
                         }
                         out.println(aes.encrypt("end_of_String_array_n10193197"));
+                    }
+                    if(line.equals(("GET_TASK_INFO"))){
+                        System.out.println("GET_TASK_INFO");
+                        String Project = aes.decrypt(in.readLine());
+                        String Task = aes.decrypt(in.readLine());
+
+                        System.out.println(Project);
+                        System.out.println(Task);
+
+                        String[] results = server_db_conection.GET_TASK_INFO(Project,Task);
+
+                        out.println(aes.encrypt(results[0]));
+                        out.println(aes.encrypt(results[1]));
+                        out.println(aes.encrypt(results[2]));
+                        out.println(aes.encrypt(results[3]));
+                        out.println(aes.encrypt(results[4]));
+                        out.println(aes.encrypt(results[5]));
+                    }
+                    if(line.equals(("UPDATE_TASK_STATUS"))){
+                        System.out.println("UPDATE_TASK_STATUS");
+                        String Project = aes.decrypt(in.readLine());
+                        String Task = aes.decrypt(in.readLine());
+                        String Status = aes.decrypt(in.readLine());
+                        if(server_db_conection.UPDATE_TASK_STATUS(Project,Task,Status)){
+                            out.println(aes.encrypt("T"));
+                        }else{
+                            out.println(aes.encrypt("F"));
+                        }
+
+                    }
+                    if(line.equals(("INSERT_NEW_MINOR_TASK"))){
+                        System.out.println("INSERT_NEW_MINOR_TASK");
+                        String RootTask = aes.decrypt(in.readLine());
+                        System.out.println(RootTask);
+                        String TaskName = aes.decrypt(in.readLine());
+                        String TaskDes = aes.decrypt(in.readLine());
+                        String Task_start = aes.decrypt(in.readLine());
+                        String Task_end = aes.decrypt(in.readLine());
+                        String Task_User = aes.decrypt(in.readLine());
+                        String Project = aes.decrypt(in.readLine());
+                        String Created_by = aes.decrypt(in.readLine());
+
+
+                        boolean response = server_db_conection.insert_minor_task_into_project(RootTask,TaskName,Project,Task_User,Created_by,Task_start,Task_end,TaskDes);
+                        System.out.println(response);
+                        if(response){
+                            out.println(aes.encrypt("T"));
+                        }else{
+                            out.println(aes.encrypt("F"));
+                        }
 
 
                     }
+                    if(line.equals(("GET_PROJECT_MINOR_TASK_INFORMATION"))){
+                        System.out.println("GET_PROJECT_MINOR_TASK_INFORMATION");
+                        String Project = aes.decrypt(in.readLine());
+                        String root_task = aes.decrypt(in.readLine());
 
+                        String[] results = server_db_conection.get_project_tasks_minor(Project,root_task);
 
-                     
-
+                        for (int i = 0; i < results.length; i++) {
+                            System.out.println(results[i]);
+                            out.println(aes.encrypt(results[i]));
+                        }
+                        System.out.println("GET_PROJECT_MINOR_TASK_INFORMATION END LOOP");
+                        out.println(aes.encrypt("end_of_String_array_n10193197"));
+                        System.out.println("GET_PROJECT_MINOR_TASK_INFORMATION END");
+                    }
                 }
 
             } catch (IOException ex) {

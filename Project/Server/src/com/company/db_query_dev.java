@@ -95,7 +95,11 @@ public class db_query_dev {
         //System.out.println(server_db_conection.insert_user_into_project("Admin","josh","test2"));
         //System.out.println(server_db_conection.insert_task_into_project());
 
-        server_db_conection.get_project_tasks("Sample Project 2");
+        //server_db_conection.get_project_tasks("Sample Project 2");
+
+        //server_db_conection.GET_TASK_INFO("Sample Project 1 - josh","one year later" );
+
+        server_db_conection.UPDATE_TASK_STATUS("Sample Project 1 - josh","test2","2");
 
     }
 }

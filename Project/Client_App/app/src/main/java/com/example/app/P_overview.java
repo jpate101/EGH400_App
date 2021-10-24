@@ -1,11 +1,15 @@
 package com.example.app;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.text.format.Time;
 import android.util.Log;
@@ -13,6 +17,7 @@ import android.util.TimeUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +43,10 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
 
     TableFixHeaders tableFixHeaders;
     public static boolean check1 = false;
+    public static boolean week_or_day = true;
+    public static boolean get_minor_task = false;
+    public static TextView task_name;
+    private Button eWeek_to_day;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -85,16 +94,48 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
         View v = inflater.inflate(R.layout.fragment_p_overview, container, false);
         //
         tableFixHeaders = (TableFixHeaders)v.findViewById(R.id.tablefixheaders);
-        MainActivity.con.state = "GET_PROJECT_TASK_INFORMATION";
+        if(!get_minor_task){
+            MainActivity.con.state = "GET_PROJECT_TASK_INFORMATION";
+        }else{
+            MainActivity.con.state = "GET_PROJECT_MINOR_TASK_INFORMATION";
+            //MainActivity.con.state = "GET_PROJECT_TASK_INFORMATION";
+            Log.e("YOUR_APP_LOG_TAG", "minor tasks");
+            //P_overview.get_minor_task = true;
+        }
+        //
+        //P_overview.get_minor_task = false;
+
         createGanttChart();
         Log.e("YOUR_APP_LOG_TAG", "end of gantt creation");
 
 
-        // Inflate the layout for this fragment
-        //getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        eWeek_to_day = v.findViewById(R.id.overview_title);
+
+        Log.e("YOUR_APP_LOG_TAG", "end of gantt creation");
+
+        if(week_or_day){
+            eWeek_to_day.setText("TIME LINE - WEEK");
+        }else{
+            eWeek_to_day.setText("TIME LINE - DAY");
+        }
+
+        Log.e("YOUR_APP_LOG_TAG", "end of gantt creation");
+
+        eWeek_to_day.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                week_or_day = !week_or_day;
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.detach(P_overview.this).attach(P_overview.this).commit();
+            }
+        });
+
+        Log.e("YOUR_APP_LOG_TAG", "end of gantt creation");
+
         return v;
     }
-
+    //error is being created bent week x and week 9 = 0 
     private void createGanttChart() {
         //wait for data
         while(true){
@@ -123,35 +164,60 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
         Log.e("YOUR_APP_LOG_TAG", "Date stuff  "+String.valueOf(Max));
         Log.e("YOUR_APP_LOG_TAG", "Date stuff  "+String.valueOf(Min));
 
-        long diffSeconds = (Max.getTime() - Min.getTime())/1000;
-        int weeks = (int)diffSeconds/(60 * 60 * 24 * 7);
+        int weeks;
+        long diffSeconds;
+
+        if(week_or_day){
+            diffSeconds = (Max.getTime() - Min.getTime())/1000;
+            weeks = (int)diffSeconds/(60 * 60 * 24 * 7);
+        }else{
+            diffSeconds = (Max.getTime() - Min.getTime())/1000;
+            weeks = (int)diffSeconds/(60 * 60 * 24);
+        }
 
         Log.e("YOUR_APP_LOG_TAG", "Date stuff  "+String.valueOf(weeks));
         Common.HEADER_COUNT = weeks+1;
         Common.COLUMN_COUNT = weeks*2+1;
 
         Max = new Date();
-
-        diffSeconds = (Max.getTime() - Min.getTime())/1000;
-        weeks = (int)diffSeconds/(60 * 60 * 24 * 7);
+        if(week_or_day){
+            diffSeconds = (Max.getTime() - Min.getTime())/1000;
+            weeks = (int)diffSeconds/(60 * 60 * 24 * 7);
+        }else{
+            diffSeconds = (Max.getTime() - Min.getTime())/1000;
+            weeks = (int)diffSeconds/(60 * 60 * 24);
+        }
 
         Common.CURRENT_WEEK = weeks;
-
         //create list item
-
-
         List<GanttItem> ganttItemList = new ArrayList<>();
-        //write all  cancelled
+        //repeat to write incomplete jobs
         for(int i = 0; i < MainActivity.con.Project_Tasks.size();i++){
 
-            long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
-            int weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
+            int weeks_x;
+            int weeks_y;
+            if(week_or_day){
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
 
-            long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
-            int weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+            }else{
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24);
 
-            if(MainActivity.con.Project_Tasks.get(i).Status == 3){
-                ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , true,new Point(weeks_x,weeks_y)));
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24);
+            }
+
+            if(MainActivity.con.Project_Tasks.get(i).Status == 1){
+                if(weeks_y < weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, true));
+                }else if(weeks_y == weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }else{
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }
             }else{
                 //ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , true,new Point(weeks_x,weeks_y)));
             }
@@ -164,14 +230,30 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
         //write all complete
         for(int i = 0; i < MainActivity.con.Project_Tasks.size();i++){
 
-            long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
-            int weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
+            int weeks_x;
+            int weeks_y;
+            if(week_or_day){
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
 
-            long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
-            int weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+            }else{
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24);
+
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24);
+            }
 
             if(MainActivity.con.Project_Tasks.get(i).Status == 2){
-                ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , true,new Point(weeks_x,weeks_y)));
+                if(weeks_y < weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, true));
+                }else if(weeks_y == weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }else{
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }
             }else{
                 //ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , true,new Point(weeks_x,weeks_y)));
             }
@@ -181,17 +263,32 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
             Log.e("YOUR_APP_LOG_TAG", "Date stuff  weeks_y  "+String.valueOf(weeks_y));
 
         }
-        //repeat to write incomplete jobs
+        //write all  cancelled
         for(int i = 0; i < MainActivity.con.Project_Tasks.size();i++){
+            int weeks_x;
+            int weeks_y;
+            if(week_or_day){
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
 
-            long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
-            int weeks_x = (int)diffSeconds_x/(60 * 60 * 24 * 7);
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+            }else{
+                long diffSeconds_x = ( MainActivity.con.Project_Tasks.get(i).Start.getTime()-Collections.min(All_dates).getTime() )/1000;
+                weeks_x = (int)diffSeconds_x/(60 * 60 * 24);
 
-            long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
-            int weeks_y = (int)diffSeconds_y/(60 * 60 * 24 * 7);
+                long diffSeconds_y = ( MainActivity.con.Project_Tasks.get(i).End.getTime() - Collections.min(All_dates).getTime() )/1000;
+                weeks_y = (int)diffSeconds_y/(60 * 60 * 24);
+            }
 
-            if(MainActivity.con.Project_Tasks.get(i).Status == 1){
-                ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , false,new Point(weeks_x,weeks_y)));
+            if(MainActivity.con.Project_Tasks.get(i).Status == 3){
+                if(weeks_y < weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, true));
+                }else if(weeks_y == weeks_x){
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }else{
+                    ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name, false, new Point(weeks_x, weeks_y), MainActivity.con.Project_Tasks.get(i).Status));
+                }
             }else{
                 //ganttItemList.add(new GanttItem(MainActivity.con.Project_Tasks.get(i).Task_Name , true,new Point(weeks_x,weeks_y)));
             }
@@ -240,7 +337,14 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
             List<String> cols = new ArrayList<>();
             if(!ganttItem.isEmpty()){
                 for(int col = 0; col< Common.COLUMN_COUNT;col++) {
-                    if (col >= ganttItem.getPoint().x) {
+
+                    if(ganttItem.getStatus() == 2){
+                        if(col == Common.CURRENT_WEEK){
+                            cols.add("complete & current_week");
+                        }else{
+                            cols.add("complete");
+                        }
+                    }else if (col >= ganttItem.getPoint().x) {
                         if (col <= ganttItem.getPoint().y) {
                             Log.e("YOUR_APP_LOG_TAG", "X    :   " + ganttItem.getPoint().x);
                             Log.e("YOUR_APP_LOG_TAG", "Y    :   " + ganttItem.getPoint().y);
@@ -255,6 +359,8 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
                             } else {
                                 cols.add("done");
                             }
+                        } else if (col <= Common.CURRENT_WEEK) {
+                            cols.add("overtime");
                         }else{
                             if(col == Common.CURRENT_WEEK){
                                 cols.add("current_week");
@@ -285,11 +391,15 @@ public class P_overview extends Fragment implements IOnHeaderClickListener {
         Log.e("YOUR_APP_LOG_TAG_2", "rows    :   " + rows);
         return rows;
     }
+    public static String sel_task;
 
     @Override
     public void onHeaderItemClick(View view, int row) {
+
         TextView textView = (TextView)view;
+        task_name = textView;
         //Toast.makeText(getContext(),"item click "+row+" Content "+textView.getText(), Toast.LENGTH_LONG).show();
+        MainActivity.con.state = "GET_TASK_INFO";
 
         Intent intent = new Intent(getContext(),Task_Page.class);
         startActivity(intent);

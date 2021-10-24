@@ -291,5 +291,109 @@ public class server_db_conection {
         return array;
     }
 
+    public static String[] GET_TASK_INFO(String Project,String Task) throws SQLException {
+        Statement stmt = myConn.createStatement();
+        String query = "SELECT Task_name,Project,Assigned_User,Created_By,Status_int,start_date,end_date,Description FROM tasks WHERE Project=\""+Project+"\" AND Task_name=\""+Task+"\"";
+        ResultSet rs = stmt.executeQuery(query);
+
+        rs.next();
+        //byte[] test = rs.getBytes("salt");
+        String Des = rs.getString("Description");
+        String Status = rs.getString("Status_int");
+        String Assigned_user = rs.getString("Assigned_User");
+        String s_date = rs.getString("start_date");
+        String e_date = rs.getString("end_date");
+
+        System.out.println(Des+Status+Assigned_user+s_date+e_date+Task);
+
+        String[] data = {Des, Status, Assigned_user, s_date, e_date, Task};
+
+
+        return data;
+    }
+    public static boolean UPDATE_TASK_STATUS(String Project,String Task,String Status) {
+        Statement stmt = null;
+        try {
+            stmt = myConn.createStatement();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        String query = "UPDATE tasks\n" +
+                "SET Status_int = "+Status+"\n" +
+                "WHERE Task_name = \""+Task+"\" AND Project = \""+Project+"\";";
+        try {
+            ResultSet rs = stmt.executeQuery(query);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+        return true;
+
+    }
+
+    public static boolean insert_minor_task_into_project(String root_task,String Task_name,String Project,String Assign_User,String Created_By,String start_D,String end_D,String Des) {
+        start_D = start_D.substring(7);
+        end_D = end_D.substring(5);
+
+        if (start_D.charAt(1) == '/') start_D = "0" + start_D;
+        if (start_D.charAt(4) == '/') start_D = start_D.substring(0,3) + "0" + start_D.substring(3);
+
+        start_D = "STR_TO_DATE(\'"+start_D+"\',\'%d/%m/%Y\')";
+        end_D = "STR_TO_DATE(\'"+end_D+"\',\'%d/%m/%Y\')";
+
+
+
+
+        try{
+            Statement stmt = myConn.createStatement();
+
+            // eg TO_DATE('17/12/2015', 'DD/MM/YYYY')
+            String query = "INSERT INTO minortasks (root_task,Task_name, Project, Assigned_User,Created_By,Status_int,start_date,end_date,Description) VALUES (\""+root_task+"\",\""+Task_name+"\",\""+Project+"\",\""+Assign_User+"\",\""+Created_By+"\",\""+String.valueOf(1)+"\","+start_D+","+end_D+",\""+Des+"\");";
+            ResultSet rs = stmt.executeQuery(query);
+            return true;
+        }catch (SQLException e ){
+            System.out.println(e);
+            return false;
+        }
+    }
+
+    public static String[] get_project_tasks_minor(String Project, String root_task) throws SQLException {
+
+        int i = 0;
+        ArrayList list = new ArrayList();
+
+
+
+        //get project tasks
+        Statement stmt = myConn.createStatement();
+        String query = "SELECT Task_Name,Status_int,start_date,end_date FROM minortasks WHERE Project=\""+Project+"\" AND root_task=\""+root_task+"\"ORDER BY end_date ASC";
+        ResultSet rs = stmt.executeQuery(query);
+        //list = new ArrayList();
+
+        while (rs.next()) {
+
+            String test = rs.getString("Task_Name");
+            String test2 = rs.getString("Status_int");
+            String test3 = rs.getString("start_date");
+            String test4 = rs.getString("end_date");
+            String test5 = "___________";
+            System.out.println(test);
+            System.out.println(test2);
+            System.out.println(test3);
+            System.out.println(test4);
+            System.out.println(test5);
+            list.add(test);
+            list.add(test2);
+            list.add(test3);
+            list.add(test4);
+            //list.add(test5);
+        }
+        String[] array = (String[]) list.toArray(new String[list.size()]);
+        System.out.println(Arrays.toString(array));
+        System.out.println(array.length);
+
+        return array;
+    }
+
 
 }

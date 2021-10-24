@@ -59,9 +59,7 @@ public class P_Home extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-
+        P_overview.get_minor_task = false;
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_p_home, container, false);
         TextView tv = v.findViewById(R.id.p_home);

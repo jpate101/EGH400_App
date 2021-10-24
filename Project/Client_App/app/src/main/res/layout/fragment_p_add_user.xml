@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
-        android:queryHint="Search Users">
+        android:queryHint="Search Users"
+        app:queryHint="Search Users">
 
     </androidx.appcompat.widget.SearchView>
 

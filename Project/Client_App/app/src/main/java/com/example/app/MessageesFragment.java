@@ -2,11 +2,18 @@ package com.example.app;
 
 import android.os.Bundle;
 
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +23,8 @@ import android.view.ViewGroup;
  * fill act_home.java/activity_home.xml activity messagesFragment tab fragment
  */
 public class MessageesFragment extends Fragment {
+    public static ArrayList<User_object_add_user> User_List_obj = new ArrayList<User_object_add_user>();
+    private ListView listView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,6 +70,66 @@ public class MessageesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_messagees, container, false);
+        View v = inflater.inflate(R.layout.fragment_messagees, container, false);
+
+        setUpData();
+        setUpList(v);
+        initSearchWidgets(v);
+        setUpOnClick();
+
+
+        return v;
+    }
+    private void initSearchWidgets(View v){
+        SearchView searchView = v.findViewById(R.id.userListSearchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                ArrayList<User_object_add_user> filteredUser = new ArrayList<User_object_add_user>();
+                for(User_object_add_user user : User_List_obj){
+                    if(user.getName().toLowerCase().contains(newText.toLowerCase())){
+                        filteredUser.add(user);
+                    }
+                }
+                User_object_adapter adapter = new User_object_adapter(getContext(),android.R.layout.simple_list_item_1,filteredUser);
+                listView.setAdapter(adapter);
+                return false;
+            }
+        });
+    }
+
+    public void setUpOnClick() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("user clicked : ", String.valueOf(position));
+            }
+        });
+
+
+    }
+
+    public void setUpList(View v) {
+        User_object_adapter adapter = new User_object_adapter(getContext(),android.R.layout.simple_list_item_1,User_List_obj);
+        listView = v.findViewById(R.id.add_user_list_view_msg);
+        listView.setAdapter(adapter);
+    }
+
+    static void setUpData() {
+        //User_List_obj = new ArrayList<User_object_add_user>();
+        //User_object_add_user test_u = new User_object_add_user("admin_from_client");
+        //User_List_obj.add(test_u);
+        //User_object_add_user test_u2 = new User_object_add_user("josh_from_client");
+        //User_List_obj.add(test_u2);
+        if(User_List_obj.isEmpty()){
+            MainActivity.con.state = "GET_ALL_USERS_2";
+        }
+
     }
 }

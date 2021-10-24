@@ -7,27 +7,21 @@
     android:orientation="vertical"
     tools:context=".P_overview">
 
-
-    <TextView
+    <Button
         android:id="@+id/overview_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Time Line"
+        android:text="Time Line - Week"
         android:textColor="@color/black"
         android:textSize="30dp" />
-
 
     <com.inqbarna.tablefixheaders.TableFixHeaders
         android:id="@+id/tablefixheaders"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:itemTextColor="@color/black"
         android:textColor="@color/black"
-        />
-
-
-
+        app:itemTextColor="@color/black" />
 
 
 </LinearLayout>

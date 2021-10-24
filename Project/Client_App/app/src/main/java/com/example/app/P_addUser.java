@@ -82,6 +82,7 @@ public class P_addUser extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        P_overview.get_minor_task = false;
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_p_add_user, container, false);
         //
