@@ -169,13 +169,13 @@ public class MainActivity extends AppCompatActivity {
                     dIn.readFully(key_en, 0, key_en.length); // read the message
                 }
 
-                KeyFactory kf = KeyFactory.getInstance("RSA"); // or "EC" or whatever
+                KeyFactory kf = KeyFactory.getInstance("RSA");
                 PrivateKey ret = kf.generatePrivate(new PKCS8EncodedKeySpec(key_en));
 
                 byte[] test;
                 test = RSA.encryptMessage_cipher("this is the message i want to see",ret);
                 dOut.writeInt(test.length); // write length of the message
-                dOut.write(test);
+                dOut.write(test);//only used for testing never got around to removing it
 
                 aes = new AES();
                 aes.GenerateKeys();
@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 dOut.write(aes_key_en);
 
                 Log.e("YOUR_APP_LOG_TAG", aes.decrypt(dIn.readUTF()));
+                //end of key exchange
 
                 while(!"exit".equalsIgnoreCase(state)){
                     if(state == null || state.equals("empty")){
@@ -295,9 +296,6 @@ public class MainActivity extends AppCompatActivity {
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         public void LOGIN_request(String inputName, String inputPass) throws Exception {
-
-
-
             out.println(aes.encrypt("LOGIN_request"));
             out.println(aes.encrypt(inputName));
             out.println(aes.encrypt(inputPass));

@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+/**
+ * class creates connection to db
+ * all db reads and modification functions are called from this class
+ */
 public class server_db_conection {
 
     /**
@@ -31,7 +35,6 @@ public class server_db_conection {
         }catch(Exception db){
             db.printStackTrace();
         }
-
     }
 
     public static Boolean Insert_New_Current_user(String user, String salt, String pass) {

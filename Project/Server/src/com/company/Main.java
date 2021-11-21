@@ -72,6 +72,9 @@ public class Main {
 
         @Override
         public void run() {
+
+            //start key encryption exchange
+            //create RSA keys
             rsa = new RSA();
             try{
                 rsa.getRSAKeys();
@@ -122,12 +125,11 @@ public class Main {
 
                 String success = "success";
                 dOut.writeUTF(aes.encrypt(success));
+                //end key exchange
+                line = "empty";//variable for storing incomming messages
 
-
-                line = "empty";
-
-                while (!"exit".equalsIgnoreCase(line)) {
-                    line = in.readLine();
+                while (!"exit".equalsIgnoreCase(line)) {//request loop
+                    line = in.readLine();//get incomming message
                     if(line == null || line.equals("empty")){
                         line = "empty";
                     }else{

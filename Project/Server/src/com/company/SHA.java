@@ -8,6 +8,7 @@ import java.util.Base64;
 
 public class SHA {
 
+    /*
     public static void main(String[] args) throws NoSuchAlgorithmException
     {
         String passwordToHash = "password";
@@ -27,6 +28,8 @@ public class SHA {
         System.out.println(securePassword);
 
     }
+
+     */
 
     public static String encrypt(String passwordToHash, byte[] salt)
     {

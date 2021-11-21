@@ -7,7 +7,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
+/**
+ * AES encryption class
+ * used for general messages
+ * aes keys are set on client side
+ */
 public class AES {
+
     public static SecretKey secretKey;
     public static byte[] secretKey_encoded;
 

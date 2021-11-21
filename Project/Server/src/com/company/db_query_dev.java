@@ -6,6 +6,9 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Base64;
 
+/**
+ * class used to test db_connection functions
+ */
 public class db_query_dev {
     public static void main(String[] args) throws NoSuchAlgorithmException, SQLException, UnsupportedEncodingException {
 

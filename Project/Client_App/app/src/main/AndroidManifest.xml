@@ -16,7 +16,7 @@
         <activity android:name=".temp_Home"></activity>
         <activity android:name=".act_registration_Main"></activity>
         <activity android:name=".MainActivity"
-            android:label="Untitled APP">
+            android:label="O Group">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
